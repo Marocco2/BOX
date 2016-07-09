@@ -1,4 +1,4 @@
-# BOX v0.1
+# BOX v0.1.1
 
 BOX is an Assetto Corsa framework created by Marco 'Marocco2' Mollace. It's created for Assetto Corsa developers who want a set of features without spending so much time.
 
@@ -60,3 +60,9 @@ In your app python (in this example `BoxApp.py`) you need to add these lines:
         importError = True
         
     ...
+
+## CHANGELOG
+
+### v0.1.1
+
+- added getZipFile function

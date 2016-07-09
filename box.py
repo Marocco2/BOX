@@ -20,7 +20,7 @@
 #
 # Assetto Corsa framework created by Marco 'Marocco2' Mollace
 #
-# version 0.1
+# version 0.1.1
 #
 # Usage of this library is under LGPLv3. Be careful :)
 #
@@ -77,7 +77,7 @@ def getNotificationFrom(telegram_api_getUpdates):
     return var_notify
 
 
-# A new functions to automatize app updates for AC
+# A new function to automatize app updates for AC
 # WORK IN PROGRESS
 # TODO: make reorder files logic
 def getNewUpdate(check_link, download_link):
@@ -119,3 +119,30 @@ def getNewUpdate(check_link, download_link):
         update_status = "Error checking new update"
         ac.log('BOX: error checking new update: ' + traceback.format_exc())
         return update_status
+
+# It downloads a zip file and extract it in a folder
+def getZipFile(download_link, dir_path):
+    try:
+        local_filename = download_link.split('/')[-1]
+        # NOTE the stream=True parameter
+        r = requests.get(download_link, stream=True)
+        log_getZipFile = "Download of " + local_filename + "completed"
+        ac.log("BOX: " + log_getZipFile)
+        with open(local_filename, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=1024):
+                if chunk:  # filter out keep-alive new chunks
+                    f.write(chunk)
+                    # f.flush() commented by recommendation from J.F.Sebastian
+        try:
+            with zipfile.ZipFile(local_filename, "r") as z:
+                z.extractall(os.path.join(os.path.dirname(__file__), dir_path))  # Extracting files
+            os.remove(local_filename)
+            log_getZipFile = "Files extracted"
+            return log_getZipFile
+        except:
+            log_getZipFile = "Error extracting files"
+            return log_getZipFile
+    except:
+        log_getZipFile = "Error downloading zip file"
+        ac.log('BOX: error downloading zip file: ' + traceback.format_exc())
+        return log_getZipFile
