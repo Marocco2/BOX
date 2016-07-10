@@ -2,6 +2,10 @@
 
 BOX is an Assetto Corsa framework created by Marco 'Marocco2' Mollace. It's created for Assetto Corsa developers who want a set of features without spending so much time.
 
+## WARNING!!!!
+
+### **This is an unstable SDK, so functions can be deprecated very soon. Check changelog or wiki what is changed**
+
 ### CURRENT FEATURES
 
 - A push notification system via Telegram bot
@@ -45,23 +49,27 @@ In your app python (in this example `BoxApp.py`) you need to add these lines:
     try:
         from box import box
     except:
-        ac.log('BoxRadio: error loading box module: ' + traceback.format_exc())
+        ac.log('BoxApp: error loading box module: ' + traceback.format_exc())
         importError = True
     try:
         from box import sim_info
     except:
-        ac.log('BoxRadio: error loading sim_info module: ' + traceback.format_exc())
+        ac.log('BoxApp: error loading sim_info module: ' + traceback.format_exc())
         importError = True
     
     try:
         from box import win32con
     except:
-        ac.log('BoxRadio: error loading win32con module: ' + traceback.format_exc())
+        ac.log('BoxApp: error loading win32con module: ' + traceback.format_exc())
         importError = True
         
     ...
 
 ## CHANGELOG
+
+### v0.1.2
+
+- reworked functions (check Wiki page)
 
 ### v0.1.1
 
