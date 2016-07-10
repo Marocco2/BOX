@@ -29,10 +29,10 @@
 import ac
 import traceback
 import os
-
+import platform
 
 try:
-    import ctypes.wintypes
+    import ctypes
 except:
     ac.log('BOX: error loading ctypes.wintypes: ' + traceback.format_exc())
     raise
@@ -59,6 +59,15 @@ def async(func):
 
     return wrapper
 
+
+if platform.architecture()[0] == "64bit":
+    dllfolder = "stdlib64"
+    dllfolder = os.path.join(os.path.dirname(__file__), dllfolder)
+    ctypes.windll[os.path.join(dllfolder, 'fmodex64.dll')]
+else:
+    dllfolder = "stdlib"
+    dllfolder = os.path.join(os.path.dirname(__file__), dllfolder)
+    ctypes.windll[os.path.join(dllfolder, 'fmodex.dll')]
 
 try:
     from box_lib import pyfmodex
