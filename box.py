@@ -70,7 +70,7 @@ else:
     ctypes.windll[os.path.join(dllfolder, 'fmodex.dll')]
 
 try:
-    from box_lib import pyfmodex
+    import pyfmodex
 except Exception as e:
     ac.log('BOX: error loading pyfmodex: ' + traceback.format_exc())
     raise
