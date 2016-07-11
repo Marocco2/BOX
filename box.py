@@ -97,10 +97,10 @@ def notification(telegram_bot_oauth):
         if message["ok"] == "true":
             var_notify = message["result"][-1]["message"]["text"]
             ac.log('BOX: Notification from Telegram: ' + var_notify)
+            return var_notify
         else:
             var_notify = "No new messages"
             ac.log('BOX: ' + var_notify)
-        return var_notify
     except:
         ac.log('BOX: No Internet connection')
         var_notify = ""
@@ -168,9 +168,10 @@ def github_newupdate(git_repo, branch='master', sha=''):
         check_link = "https://api.github.com/repos/" + git_repo + "/commits/" + branch
         headers = {'Accept': 'application/vnd.github.VERSION.sha'}
         r = requests.get(check_link, headers=headers)
+        sha_file = "apps\\python\\" + git_repo.split('/')[-1] + "\sha.txt"
         if sha == "":
             try:
-                with open('sha.txt', 'r') as g:
+                with open(sha_file, 'r') as g:
                     sha = g.read()
                     g.close()
             except:
@@ -180,7 +181,7 @@ def github_newupdate(git_repo, branch='master', sha=''):
         if r.text != sha:  # Check if server version and client version is the same
             download_link = "https://github.com/" + git_repo + "/archive/" + branch + ".zip"
             update_status = get_zipfile(download_link)
-            with open("apps\\python\\" + git_repo.split('/')[-1] + "\sha.txt", 'w') as j:
+            with open(sha_file, 'w') as j:
                 j.write(r.text)
                 j.close()
             return update_status
