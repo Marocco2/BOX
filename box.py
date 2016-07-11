@@ -97,10 +97,10 @@ def notification(telegram_bot_oauth):
         if message["ok"] == "true":
             var_notify = message["result"][-1]["message"]["text"]
             ac.log('BOX: Notification from Telegram: ' + var_notify)
+            return var_notify
         else:
             var_notify = "No new messages"
             ac.log('BOX: ' + var_notify)
-        return var_notify
     except:
         ac.log('BOX: No Internet connection')
         var_notify = ""
