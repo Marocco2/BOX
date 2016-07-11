@@ -37,8 +37,6 @@ except:
     ac.log('BOX: error loading ctypes.wintypes: ' + traceback.format_exc())
     raise
 
-from ctypes.wintypes import MAX_PATH
-
 # TODO: read from config file for filters | IMPORTS
 from os.path import dirname, realpath
 # import configparser
@@ -63,11 +61,13 @@ def async(func):
 if platform.architecture()[0] == "64bit":
     dllfolder = "stdlib64"
     dllfolder = os.path.join(os.path.dirname(__file__), dllfolder)
-    ctypes.windll[os.path.join(dllfolder, 'fmodex64.dll')]
 else:
     dllfolder = "stdlib"
     dllfolder = os.path.join(os.path.dirname(__file__), dllfolder)
-    ctypes.windll[os.path.join(dllfolder, 'fmodex.dll')]
+
+sys.path.insert(0, dllfolder)
+os.environ['PATH'] = os.environ['PATH'] + ";."
+ctypes.windll(os.path.join(dllfolder, 'fmodex.dll'))
 
 try:
     import pyfmodex
