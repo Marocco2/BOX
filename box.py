@@ -180,8 +180,9 @@ def github_newupdate(git_repo, branch='master', sha=''):
         if r.text != sha:  # Check if server version and client version is the same
             download_link = "https://github.com/" + git_repo + "/archive/" + branch + ".zip"
             update_status = get_zipfile(download_link)
-            def new_sha():
-                return r.text
+            with open("apps\\python\\" + git_repo.split('/')[-1] + "\sha.txt", 'w') as j:
+                j.write(r.text)
+                j.close()
             return update_status
         else:
             update_status = "No new update"
