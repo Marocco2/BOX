@@ -72,6 +72,8 @@ sys.path.insert(0, dllfolder)
 os.environ['PATH'] = os.environ['PATH'] + ";."
 ctypes.windll[os.path.join(dllfolder, fmodex)]
 ac.log('BOX: ' + os.path.join(dllfolder, fmodex))
+box_lib_folder = os.path.join(os.path.dirname(__file__), 'box_lib')
+sys.path.insert(0, box_lib_folder)
 
 
 try:
