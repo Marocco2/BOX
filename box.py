@@ -75,7 +75,7 @@ ac.log('BOX: ' + os.path.join(dllfolder, fmodex))
 
 
 try:
-    from BOX.box_lib import pyfmodex
+    import box_lib.pyfmodex
 except Exception as e:
     ac.log('BOX: error loading pyfmodex: ' + traceback.format_exc())
     raise
@@ -184,7 +184,7 @@ class SoundPlayer(object):
         self.playbackvol = 1.0
         self.EQ = []
         self.initEq()
-        self.sound_mode = pyfmodex.constants.FMOD_2D
+        self.sound_mode = box_lib.pyfmodex.constants.FMOD_2D
         self.speaker_mix = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
         for i in self.EQ:
             self.player.add_dsp(i)
@@ -197,10 +197,10 @@ class SoundPlayer(object):
     def initEq(self):
         freq = [16.0, 31.5, 63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0, 16000.0]
         for i in freq:
-            dsp = self.player.create_dsp_by_type(pyfmodex.constants.FMOD_DSP_TYPE_PARAMEQ)
-            dsp.set_param(pyfmodex.constants.FMOD_DSP_PARAMEQ_GAIN, 1.0)
-            dsp.set_param(pyfmodex.constants.FMOD_DSP_PARAMEQ_BANDWIDTH, 1.0)
-            dsp.set_param(pyfmodex.constants.FMOD_DSP_PARAMEQ_CENTER, i)
+            dsp = self.player.create_dsp_by_type(box_lib.pyfmodex.constants.FMOD_DSP_TYPE_PARAMEQ)
+            dsp.set_param(box_lib.pyfmodex.constants.FMOD_DSP_PARAMEQ_GAIN, 1.0)
+            dsp.set_param(box_lib.pyfmodex.constants.FMOD_DSP_PARAMEQ_BANDWIDTH, 1.0)
+            dsp.set_param(box_lib.pyfmodex.constants.FMOD_DSP_PARAMEQ_CENTER, i)
             self.EQ.append(dsp)
 
     def set_volume(self, volume):
@@ -213,10 +213,10 @@ class SoundPlayer(object):
         self.playbackpos = position
 
     def set_gain(self, gain):
-        if self.sound_mode == pyfmodex.constants.FMOD_3D:
+        if self.sound_mode == box_lib.pyfmodex.constants.FMOD_3D:
             for i in self.EQ:
-                i.set_param(pyfmodex.constants.FMOD_DSP_PARAMEQ_GAIN, gain)
-        elif self.sound_mode == pyfmodex.constants.FMOD_2D:
+                i.set_param(box_lib.pyfmodex.constants.FMOD_DSP_PARAMEQ_GAIN, gain)
+        elif self.sound_mode == box_lib.pyfmodex.constants.FMOD_2D:
             volume = gain
             self.speaker_mix = [volume, volume, volume, 1.0, volume, volume, volume, volume]
 
@@ -241,11 +241,11 @@ class SoundPlayer(object):
             queue_len = len(self.queue)
             while queue_len > 0:
                 self.player.play_sound(self.queue[0]['sound'], False, 0)
-                if self.sound_mode == pyfmodex.constants.FMOD_3D and self.queue[0][
-                    'mode'] == pyfmodex.constants.FMOD_3D:
+                if self.sound_mode == box_lib.pyfmodex.constants.FMOD_3D and self.queue[0][
+                    'mode'] == box_lib.pyfmodex.constants.FMOD_3D:
                     self.channel.position = self.playbackpos
-                elif self.sound_mode == pyfmodex.constants.FMOD_2D and self.queue[0][
-                    'mode'] == pyfmodex.constants.FMOD_2D:
+                elif self.sound_mode == box_lib.pyfmodex.constants.FMOD_2D and self.queue[0][
+                    'mode'] == box_lib.pyfmodex.constants.FMOD_2D:
                     self.channel.spectrum_mix = self.speaker_mix
                 self.channel.volume = self.playbackvol
                 self.player.update()
