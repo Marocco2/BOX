@@ -77,7 +77,7 @@ sys.path.insert(0, box_lib_folder)
 
 
 try:
-    import box_lib.pyfmodex
+    import pyfmodex
 except Exception as e:
     ac.log('BOX: error loading pyfmodex: ' + traceback.format_exc())
     raise
