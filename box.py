@@ -62,13 +62,15 @@ def async(func):
 if platform.architecture()[0] == "64bit":
     dllfolder = "stdlib64"
     dllfolder = os.path.join(os.path.dirname(__file__), dllfolder)
+    fmodex = "fmodex64.dll"
 else:
     dllfolder = "stdlib"
     dllfolder = os.path.join(os.path.dirname(__file__), dllfolder)
+    fmodex = "fmodex.dll"
 
 sys.path.insert(0, dllfolder)
 os.environ['PATH'] = os.environ['PATH'] + ";."
-ctypes.windll(os.path.join(dllfolder, 'fmodex.dll'))
+ctypes.windll(os.path.join(dllfolder, fmodex))
 
 try:
     import pyfmodex
