@@ -70,7 +70,7 @@ else:
 
 sys.path.insert(0, dllfolder)
 os.environ['PATH'] = os.environ['PATH'] + ";."
-ctypes.windll(os.path.join(dllfolder, fmodex))
+ctypes.windll[os.path.join(dllfolder, fmodex)]
 
 try:
     import pyfmodex
