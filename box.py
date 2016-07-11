@@ -75,7 +75,7 @@ ac.log('BOX: ' + os.path.join(dllfolder, fmodex))
 
 
 try:
-    import pyfmodex
+    from BOX.box_lib import pyfmodex
 except Exception as e:
     ac.log('BOX: error loading pyfmodex: ' + traceback.format_exc())
     raise
