@@ -94,7 +94,7 @@ def notification(telegram_bot_oauth):
         telegram_api_url = "http://api.telegram.org/bot" + telegram_bot_oauth + "/getUpdates"
         r = requests.get(telegram_api_url)
         message = r.json()
-        if message['ok']:
+        if message["ok"] == "true":
             var_notify = message["result"][-1]["message"]["text"]
             ac.log('BOX: Notification from Telegram: ' + var_notify)
         else:
