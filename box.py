@@ -73,7 +73,7 @@ os.environ['PATH'] = os.environ['PATH'] + ";."
 ctypes.windll[os.path.join(dllfolder, fmodex)]
 
 try:
-    import pyfmodex
+    from box_lib import pyfmodex
 except Exception as e:
     ac.log('BOX: error loading pyfmodex: ' + traceback.format_exc())
     raise
