@@ -20,7 +20,7 @@
 #
 # Assetto Corsa framework created by Marco 'Marocco2' Mollace
 #
-# version 0.1.2
+# version 0.1.3
 #
 # Usage of this library is under LGPLv3. Be careful :)
 #
@@ -35,7 +35,7 @@ import platform
 try:
     import ctypes
 except:
-    ac.log('BOX: error loading ctypes.wintypes: ' + traceback.format_exc())
+    ac.log('BOX: error loading ctypes: ' + traceback.format_exc())
     raise
 
 # TODO: read from config file for filters | IMPORTS
@@ -71,7 +71,6 @@ else:
 sys.path.insert(0, dllfolder)
 os.environ['PATH'] = os.environ['PATH'] + ";."
 ctypes.windll[os.path.join(dllfolder, fmodex)]
-ac.log('BOX: ' + os.path.join(dllfolder, fmodex))
 box_lib_folder = os.path.join(os.path.dirname(__file__), 'box_lib')
 sys.path.insert(0, box_lib_folder)
 
@@ -90,13 +89,17 @@ except Exception as e:
 
 
 # A useful push notification via Telegram if I need send some news
-def NotifyFrom(self, telegram_bot_oauth):
+def notification(telegram_bot_oauth):
     try:
         telegram_api_url = "http://api.telegram.org/bot" + telegram_bot_oauth + "/getUpdates"
         r = requests.get(telegram_api_url)
         message = r.json()
-        var_notify = message["result"][-1]["message"]["text"]
-        ac.log('BOX: Notification from Telegram: ' + var_notify)
+        if message['ok']:
+            var_notify = message["result"][-1]["message"]["text"]
+            ac.log('BOX: Notification from Telegram: ' + var_notify)
+        else:
+            var_notify = "No new messages"
+            ac.log('BOX: ' + var_notify)
         return var_notify
     except:
         ac.log('BOX: No Internet connection')
@@ -110,17 +113,23 @@ def get_zipfile(download_link, dir_path=''):
         local_filename = download_link.split('/')[-1]
         # NOTE the stream=True parameter
         r = requests.get(download_link, stream=True)
-        log_getZipFile = "Download of " + local_filename + "completed"
+        log_getZipFile = "Download of " + local_filename + " completed"
+        where_is_zip = os.path.join(os.path.dirname(__file__), local_filename)
         ac.log("BOX: " + log_getZipFile)
         with open(local_filename, 'wb') as f:
             for chunk in r.iter_content(chunk_size=1024):
                 if chunk:  # filter out keep-alive new chunks
                     f.write(chunk)
                     # f.flush() commented by recommendation from J.F.Sebastian
+
+        ac.log("BOX: " + where_is_zip)
         try:
             with zipfile.ZipFile(local_filename, "r") as z:
-                z.extractall(os.path.join(os.path.dirname(__file__), dir_path))  # Extracting files
-            os.remove(local_filename)
+                if dir_path == "":
+                    z.extractall(os.path.dirname(__file__))  # Extracting files
+                else:
+                    z.extractall(os.path.join(os.path.dirname(__file__), dir_path))  # Extracting files
+            # os.remove(local_filename)
             log_getZipFile = "Files extracted"
             return log_getZipFile
         except:
@@ -154,14 +163,21 @@ def newupdate(version, check_link, download_link):
 # Uses GitHub to check updates
 # WORK IN PROGRESS
 # TODO: make reorder files logic
-def github_newupdate(sha, git_repo, branch='master'):
+def github_newupdate(git_repo, branch='master', sha=''):
     try:
         check_link = "https://api.github.com/repos/" + git_repo + "/commits/" + branch
         headers = {'Accept': 'application/vnd.github.VERSION.sha'}
         r = requests.get(check_link, headers=headers)
+        if sha == "":
+            with open('sha.txt', 'r') as g:
+                sha = g.read()
+                g.close()
         if r.text != sha:  # Check if server version and client version is the same
             download_link = "https://github.com/" + git_repo + "/archive/" + branch + ".zip"
             update_status = get_zipfile(download_link)
+            with open('sha.txt', 'w') as j:
+                j.write(r.text)
+                j.close()
             return update_status
         else:
             update_status = "No new update"
@@ -186,7 +202,7 @@ class SoundPlayer(object):
         self.playbackvol = 1.0
         self.EQ = []
         self.initEq()
-        self.sound_mode = box_lib.pyfmodex.constants.FMOD_2D
+        self.sound_mode = pyfmodex.constants.FMOD_2D
         self.speaker_mix = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
         for i in self.EQ:
             self.player.add_dsp(i)
@@ -199,10 +215,10 @@ class SoundPlayer(object):
     def initEq(self):
         freq = [16.0, 31.5, 63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0, 16000.0]
         for i in freq:
-            dsp = self.player.create_dsp_by_type(box_lib.pyfmodex.constants.FMOD_DSP_TYPE_PARAMEQ)
-            dsp.set_param(box_lib.pyfmodex.constants.FMOD_DSP_PARAMEQ_GAIN, 1.0)
-            dsp.set_param(box_lib.pyfmodex.constants.FMOD_DSP_PARAMEQ_BANDWIDTH, 1.0)
-            dsp.set_param(box_lib.pyfmodex.constants.FMOD_DSP_PARAMEQ_CENTER, i)
+            dsp = self.player.create_dsp_by_type(pyfmodex.constants.FMOD_DSP_TYPE_PARAMEQ)
+            dsp.set_param(pyfmodex.constants.FMOD_DSP_PARAMEQ_GAIN, 1.0)
+            dsp.set_param(pyfmodex.constants.FMOD_DSP_PARAMEQ_BANDWIDTH, 1.0)
+            dsp.set_param(pyfmodex.constants.FMOD_DSP_PARAMEQ_CENTER, i)
             self.EQ.append(dsp)
 
     def set_volume(self, volume):
@@ -215,10 +231,10 @@ class SoundPlayer(object):
         self.playbackpos = position
 
     def set_gain(self, gain):
-        if self.sound_mode == box_lib.pyfmodex.constants.FMOD_3D:
+        if self.sound_mode == pyfmodex.constants.FMOD_3D:
             for i in self.EQ:
-                i.set_param(box_lib.pyfmodex.constants.FMOD_DSP_PARAMEQ_GAIN, gain)
-        elif self.sound_mode == box_lib.pyfmodex.constants.FMOD_2D:
+                i.set_param(pyfmodex.constants.FMOD_DSP_PARAMEQ_GAIN, gain)
+        elif self.sound_mode == pyfmodex.constants.FMOD_2D:
             volume = gain
             self.speaker_mix = [volume, volume, volume, 1.0, volume, volume, volume, volume]
 
@@ -243,11 +259,11 @@ class SoundPlayer(object):
             queue_len = len(self.queue)
             while queue_len > 0:
                 self.player.play_sound(self.queue[0]['sound'], False, 0)
-                if self.sound_mode == box_lib.pyfmodex.constants.FMOD_3D and self.queue[0][
-                    'mode'] == box_lib.pyfmodex.constants.FMOD_3D:
+                if self.sound_mode == pyfmodex.constants.FMOD_3D and self.queue[0][
+                    'mode'] == pyfmodex.constants.FMOD_3D:
                     self.channel.position = self.playbackpos
-                elif self.sound_mode == box_lib.pyfmodex.constants.FMOD_2D and self.queue[0][
-                    'mode'] == box_lib.pyfmodex.constants.FMOD_2D:
+                elif self.sound_mode == pyfmodex.constants.FMOD_2D and self.queue[0][
+                    'mode'] == pyfmodex.constants.FMOD_2D:
                     self.channel.spectrum_mix = self.speaker_mix
                 self.channel.volume = self.playbackvol
                 self.player.update()
