@@ -169,9 +169,14 @@ def github_newupdate(git_repo, branch='master', sha=''):
         headers = {'Accept': 'application/vnd.github.VERSION.sha'}
         r = requests.get(check_link, headers=headers)
         if sha == "":
-            with open('sha.txt', 'r') as g:
-                sha = g.read()
-                g.close()
+            try:
+                with open('sha.txt', 'r') as g:
+                    sha = g.read()
+                    g.close()
+            except:
+                update_status = "No SHA available"
+                ac.log('BOX: ' + update_status)
+                return update_status
         if r.text != sha:  # Check if server version and client version is the same
             download_link = "https://github.com/" + git_repo + "/archive/" + branch + ".zip"
             update_status = get_zipfile(download_link)
