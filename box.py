@@ -144,11 +144,11 @@ def get_zipfile(download_link, dir_path=''):
 # A new function to automatize app updates for AC
 # WORK IN PROGRESS
 # TODO: make reorder files logic
-def newupdate(version, check_link, download_link):
+def newupdate(version, check_link, download_link, dir_path=''):
     try:
         r = requests.get(check_link)
         if r.json() != version:  # Check if server version and client version is the same
-            update_status = get_zipfile(download_link)
+            update_status = get_zipfile(download_link, dir_path)
             return update_status
         else:
             update_status = "No new update"
@@ -163,7 +163,7 @@ def newupdate(version, check_link, download_link):
 # Uses GitHub to check updates
 # WORK IN PROGRESS
 # TODO: make reorder files logic
-def github_newupdate(git_repo, branch='master', sha=''):
+def github_newupdate(git_repo, branch='master', sha='', dir_path=''):
     try:
         check_link = "https://api.github.com/repos/" + git_repo + "/commits/" + branch
         headers = {'Accept': 'application/vnd.github.VERSION.sha'}
@@ -179,7 +179,7 @@ def github_newupdate(git_repo, branch='master', sha=''):
                 return update_status
         if r.text != sha:  # Check if server version and client version is the same
             download_link = "https://github.com/" + git_repo + "/archive/" + branch + ".zip"
-            update_status = get_zipfile(download_link)
+            update_status = get_zipfile(download_link, dir_path)
             with open("apps\\python\\" + git_repo.split('/')[-1] + "\sha.txt", 'w') as j:
                 j.write(r.text)
                 j.close()
