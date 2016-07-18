@@ -24,16 +24,6 @@ some_app.py::
 Do whatever you want with this code!
 WBR, Rombik :)
 """
-import sys
-import os
-import platform
-if platform.architecture()[0] == "64bit":
-  sysdir = "stdlib64"
-else:
-  sysdir = "stdlib"
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), sysdir))
-os.environ['PATH'] = os.environ['PATH'] + ";."
 import mmap
 import functools
 import ctypes
@@ -162,20 +152,20 @@ class SimInfo:
     def __del__(self):
         self.close()
 
-sim_info = SimInfo()
+info = SimInfo()
 
 
 def demo():
     import time
 
     for _ in range(400):
-        print(sim_info.static.track, sim_info.graphics.tyreCompound, sim_info.graphics.currentTime,
-              sim_info.physics.rpms, sim_info.graphics.currentTime, sim_info.static.maxRpm, list(sim_info.physics.tyreWear))
+        print(info.static.track, info.graphics.tyreCompound, info.graphics.currentTime,
+              info.physics.rpms, info.graphics.currentTime, info.static.maxRpm, list(info.physics.tyreWear))
         time.sleep(0.1)
 
 
 def do_test():
-    for struct in sim_info.static, sim_info.graphics, sim_info.physics:
+    for struct in info.static, info.graphics, info.physics:
         print(struct.__class__.__name__)
         for field, type_spec in struct._fields_:
             value = getattr(struct, field)
