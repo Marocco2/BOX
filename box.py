@@ -108,7 +108,7 @@ def notification(telegram_bot_oauth):
 
 
 # It downloads a zip file and extract it in a folder
-def get_zipfile(download_link, dir_path=''):
+def get_zipfile(download_link, dir_path='', absolute_path=False):
     try:
         local_filename = download_link.split('/')[-1]
         # NOTE the stream=True parameter
@@ -125,8 +125,10 @@ def get_zipfile(download_link, dir_path=''):
         ac.log("BOX: " + where_is_zip)
         try:
             with zipfile.ZipFile(local_filename, "r") as z:
-                if dir_path == "":
+                if dir_path == "" and not absolute_path:
                     z.extractall(os.path.dirname(__file__))  # Extracting files
+                elif absolute_path:
+                    z.extractall(dir_path)  # Extracting files
                 else:
                     z.extractall(os.path.join(os.path.dirname(__file__), dir_path))  # Extracting files
             # os.remove(local_filename)
@@ -170,7 +172,7 @@ def github_newupdate(git_repo, branch='master', sha='', dir_path=''):
         r = requests.get(check_link, headers=headers)
         if sha == "":
             try:
-                with open('sha.txt', 'r') as g:
+                with open("apps\\python\\" + git_repo.split('/')[-1] + "\sha.txt", 'r') as g:
                     sha = g.read()
                     g.close()
             except:
@@ -278,3 +280,5 @@ class SoundPlayer(object):
                 self.queue.pop(0)
                 queue_len = len(self.queue)
             self._play_event.clear()
+
+FModSystem = pyfmodex.System()
