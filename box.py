@@ -90,10 +90,10 @@ except Exception as e:
 # A useful push notification via Telegram if I need send some news
 def notification(telegram_bot_oauth):
     try:
-        telegram_api_url = "http://api.telegram.org/bot" + telegram_bot_oauth + "/getUpdates"
+        telegram_api_url = "https://api.telegram.org/bot" + telegram_bot_oauth + "/getUpdates"
         r = requests.get(telegram_api_url)
         message = r.json()
-        if message["ok"] == "true":
+        if message["ok"]:
             var_notify = message["result"][-1]["message"]["text"]
             ac.log('BOX: Notification from Telegram: ' + var_notify)
             return var_notify
@@ -206,7 +206,7 @@ class SoundPlayer(object):
         self.playbackvol = 1.0
         self.EQ = []
         self.initEq()
-        self.sound_mode = pyfmodex.constants.FMOD_2D
+        self.sound_mode = pyfmodex.constants.FMOD_CREATECOMPRESSEDSAMPLE
         self.speaker_mix = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
         for i in self.EQ:
             self.player.add_dsp(i)
@@ -242,12 +242,11 @@ class SoundPlayer(object):
             volume = gain
             self.speaker_mix = [volume, volume, volume, 1.0, volume, volume, volume, volume]
 
-
     @async
     def stop(self):
         try:
             self.channel.paused = 1
-            #self.queue.pop(0)
+            # self.queue.pop(0)
         except:
             ac.log('BOX: stop() error ' + traceback.format_exc())
 
@@ -261,6 +260,7 @@ class SoundPlayer(object):
                     state = self._play_event.is_set()
                     if state == False:
                         self._play_event.set()
+                    return 1  # mp3 loaded
                 else:
                     ac.log('BOX: File not found : %s' % filename)
         except:
@@ -270,22 +270,16 @@ class SoundPlayer(object):
         leng = self.queue.__len__()
         return leng
 
-
     def _worker(self):
         while True:
             self._play_event.wait()
             queue_len = len(self.queue)
             while queue_len > 0:
                 self.player.play_sound(self.queue[0]['sound'], False, 0)
-                if self.sound_mode == pyfmodex.constants.FMOD_3D and self.queue[0][
-                    'mode'] == pyfmodex.constants.FMOD_3D:
-                    self.channel.position = self.playbackpos
-                elif self.sound_mode == pyfmodex.constants.FMOD_2D and self.queue[0][
-                    'mode'] == pyfmodex.constants.FMOD_2D:
-                    self.channel.spectrum_mix = self.speaker_mix
+                self.channel.spectrum_mix = self.speaker_mix
                 self.channel.volume = self.playbackvol
                 self.player.update()
-                while self.channel.paused == 0:
+                while self.channel.paused == 0 and self.channel.is_playing == 1:
                     time.sleep(0.1)
                 self.queue[0]['sound'].release()
                 self.queue.pop(0)
