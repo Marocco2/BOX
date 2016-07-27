@@ -20,7 +20,7 @@
 #
 # Assetto Corsa framework created by Marco 'Marocco2' Mollace
 #
-# version 0.1.3
+# version 0.2
 #
 # Usage of this library is under LGPLv3. Be careful :)
 #
