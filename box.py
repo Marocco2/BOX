@@ -31,6 +31,7 @@ import traceback
 import os
 import sys
 import platform
+import update
 
 try:
     import ctypes
@@ -105,6 +106,34 @@ def notification(telegram_bot_oauth):
         var_notify = ""
         return var_notify
 
+def updatepyBox(sha=''):
+    result = 0
+    check_link = "https://api.github.com/repos/Marocco2/BOX/commits/shipping"
+    headers = {'Accept': 'application/vnd.github.VERSION.sha'}
+    r = requests.get(check_link, headers=headers)
+    if sha == "":
+        try:
+            with open("sha.txt", 'r') as g:
+                sha = g.read()
+                g.close()
+        except:
+            update_status = "No SHA available"
+            return update_status
+    if r.text != sha:  # Check if server version and client version is the same
+        download_link = "https://raw.githubusercontent.com/Marocco2/BOX/update.py"
+        p = requests.get(download_link)
+        update_status = "update.py updated"
+        with open("update.py", 'w') as j:
+            j.write(p.text)
+            j.close()
+        return update_status
+    else:
+        update_status = "No new update"
+        return update_status
+
+def updateBox(sha=''):
+    updatepyBox()
+    update.box()
 
 # It downloads a zip file and extract it in a folder
 def get_zipfile(download_link, dir_path='', absolute_path=False):
@@ -166,6 +195,7 @@ def newupdate(version, check_link, download_link, dir_path=''):
 # TODO: make reorder files logic
 def github_newupdate(git_repo, branch='master', sha='', dir_path=''):
     try:
+        updateBox()
         check_link = "https://api.github.com/repos/" + git_repo + "/commits/" + branch
         headers = {'Accept': 'application/vnd.github.VERSION.sha'}
         r = requests.get(check_link, headers=headers)
